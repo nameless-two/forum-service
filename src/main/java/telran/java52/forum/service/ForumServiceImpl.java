@@ -3,34 +3,44 @@ package telran.java52.forum.service;
 import java.util.List;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import telran.java52.forum.dao.PostRepository;
 import telran.java52.forum.dto.CommentAddDto;
 import telran.java52.forum.dto.PeriodDto;
 import telran.java52.forum.dto.PostAddDto;
 import telran.java52.forum.dto.PostDto;
+import telran.java52.forum.dto.exception.PostNotFoundException;
+import telran.java52.forum.model.Comment;
+import telran.java52.forum.model.Post;
 
 @Service
 @RequiredArgsConstructor
 public class ForumServiceImpl implements ForumService {
 
+	final PostRepository postRepository;
+	final ModelMapper modelMapper;
+
 	@Override
 	public PostDto addPost(String user, PostAddDto postAddDto) {
-		// TODO Auto-generated method stub
-		return null;
+		Post post = modelMapper.map(postAddDto, Post.class);
+		post.setAuthor(user);
+		post = postRepository.save(post);
+		return modelMapper.map(post, PostDto.class);
 	}
 
 	@Override
 	public PostDto findPostById(String postId) {
-		// TODO Auto-generated method stub
-		return null;
+		return modelMapper.map(postRepository.findById(postId).orElseThrow(PostNotFoundException::new), PostDto.class);
 	}
 
 	@Override
 	public void addLike(String postId) {
-		// TODO Auto-generated method stub
-
+		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+		post.addLike();
+		postRepository.save(post);
 	}
 
 	@Override
@@ -41,14 +51,18 @@ public class ForumServiceImpl implements ForumService {
 
 	@Override
 	public PostDto addComment(String postId, String user, CommentAddDto commentAddDto) {
-		// TODO Auto-generated method stub
-		return null;
+		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+		Comment comment = new Comment(user, commentAddDto.getMessage());
+		post.addComment(comment);
+		post = postRepository.save(post);
+		return modelMapper.map(post, PostDto.class);
 	}
 
 	@Override
 	public PostDto deletePost(String postId) {
-		// TODO Auto-generated method stub
-		return null;
+		PostDto post = findPostById(postId);
+		postRepository.deleteById(postId);
+		return post;
 	}
 
 	@Override
@@ -65,8 +79,16 @@ public class ForumServiceImpl implements ForumService {
 
 	@Override
 	public PostDto updatePost(String postId, PostAddDto postAddDto) {
-		// TODO Auto-generated method stub
-		return null;
+		Post post = postRepository.findById(postId).orElseThrow(PostNotFoundException::new);
+		if (postAddDto.getTitle() != null)
+			post.setTitle(postAddDto.getTitle());
+		if (postAddDto.getContent() != null)
+			post.setContent(postAddDto.getContent());
+		List<String> tags = postAddDto.getTags();
+		if (tags != null)
+			tags.forEach(post::addTag);
+		post = postRepository.save(post);
+		return modelMapper.map(post, PostDto.class);
 	}
 
 }
