@@ -1,6 +1,5 @@
 package telran.java52.forum.service;
 
-import java.util.List;
 import java.util.Set;
 
 import telran.java52.forum.dto.CommentAddDto;
@@ -16,15 +15,15 @@ public interface ForumService {
 	
 	void addLike(String postId);
 	
-	List<PostDto> findPostsByAuthor(String user);
+	Iterable<PostDto> findPostsByAuthor(String user);
 	
 	PostDto addComment(String postId, String user, CommentAddDto commentAddDto);
 	
 	PostDto deletePost(String postId);
 
-	List<PostDto> findPostsByTags(Set<String> tags);
+	Iterable<PostDto> findPostsByTags(Set<String> tags);
 	
-	List<PostDto> findPostsByPeriod(PeriodDto period);
+	Iterable<PostDto> findPostsByPeriod(PeriodDto period);
 	
 	PostDto updatePost(String postId, PostAddDto postAddDto);
 	

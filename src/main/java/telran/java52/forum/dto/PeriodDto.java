@@ -1,5 +1,7 @@
 package telran.java52.forum.dto;
 
+import java.time.LocalDate;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PeriodDto {
 
-	String dateFrom;
-	String dateTo;
+	LocalDate dateFrom;
+	LocalDate dateTo;
 
 }

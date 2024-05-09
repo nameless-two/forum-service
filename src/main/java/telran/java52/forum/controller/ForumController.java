@@ -1,6 +1,5 @@
 package telran.java52.forum.controller;
 
-import java.util.List;
 import java.util.Set;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -9,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ import telran.java52.forum.service.ForumService;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/forum")
 public class ForumController {
 
 	final ForumService forumService;
@@ -40,7 +41,7 @@ public class ForumController {
 	}
 
 	@GetMapping("/posts/author/{user}")
-	public List<PostDto> findPostsByAuthor(@PathVariable String user) {
+	public Iterable<PostDto> findPostsByAuthor(@PathVariable String user) {
 		return forumService.findPostsByAuthor(user);
 	}
 
@@ -56,12 +57,12 @@ public class ForumController {
 	}
 
 	@PostMapping("/posts/tags")
-	public List<PostDto> findPostsByTags(@RequestBody Set<String> tags) {
+	public Iterable<PostDto> findPostsByTags(@RequestBody Set<String> tags) {
 		return forumService.findPostsByTags(tags);
 	}
 
 	@PostMapping("/posts/period")
-	public List<PostDto> findPostsByPeriod(@RequestBody PeriodDto period) {
+	public Iterable<PostDto> findPostsByPeriod(@RequestBody PeriodDto period) {
 		return forumService.findPostsByPeriod(period);
 	}
 
