@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class CommentAddDto {
 	
-	String postId;
-	String user;
 	String message;
 
 }

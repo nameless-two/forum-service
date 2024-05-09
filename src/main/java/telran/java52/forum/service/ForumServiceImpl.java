@@ -6,10 +6,10 @@ import java.util.Set;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import telran.java52.forum.dto.CommentAddDto;
 import telran.java52.forum.dto.PeriodDto;
 import telran.java52.forum.dto.PostAddDto;
 import telran.java52.forum.dto.PostDto;
-import telran.java52.forum.dto.PostUpdateDto;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +40,7 @@ public class ForumServiceImpl implements ForumService {
 	}
 
 	@Override
-	public PostDto addComment(String postId, String user, String message) {
+	public PostDto addComment(String postId, String user, CommentAddDto commentAddDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -64,7 +64,7 @@ public class ForumServiceImpl implements ForumService {
 	}
 
 	@Override
-	public PostDto updatePost(String postId, PostUpdateDto postUpdateDto) {
+	public PostDto updatePost(String postId, PostAddDto postAddDto) {
 		// TODO Auto-generated method stub
 		return null;
 	}

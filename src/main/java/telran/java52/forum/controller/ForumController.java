@@ -12,10 +12,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import lombok.RequiredArgsConstructor;
+import telran.java52.forum.dto.CommentAddDto;
 import telran.java52.forum.dto.PeriodDto;
 import telran.java52.forum.dto.PostAddDto;
 import telran.java52.forum.dto.PostDto;
-import telran.java52.forum.dto.PostUpdateDto;
 import telran.java52.forum.service.ForumService;
 
 @RestController
@@ -45,8 +45,9 @@ public class ForumController {
 	}
 
 	@PutMapping("/post/{postId}/comment/{user}")
-	public PostDto addComment(@PathVariable String postId, @PathVariable String user, @RequestBody String message) {
-		return forumService.addComment(postId, user, message);
+	public PostDto addComment(@PathVariable String postId, @PathVariable String user,
+			@RequestBody CommentAddDto commentAddDto) {
+		return forumService.addComment(postId, user, commentAddDto);
 	}
 
 	@DeleteMapping("/post/{postId}")
@@ -58,15 +59,15 @@ public class ForumController {
 	public List<PostDto> findPostsByTags(@RequestBody Set<String> tags) {
 		return forumService.findPostsByTags(tags);
 	}
-	
+
 	@PostMapping("/posts/period")
 	public List<PostDto> findPostsByPeriod(@RequestBody PeriodDto period) {
 		return forumService.findPostsByPeriod(period);
 	}
-	
+
 	@PutMapping("post/{postId}")
-	public PostDto updatePost(@PathVariable String postId, @RequestBody PostUpdateDto postUpdateDto) {
-		return forumService.updatePost(postId, postUpdateDto);
+	public PostDto updatePost(@PathVariable String postId, @RequestBody PostAddDto postAddDto) {
+		return forumService.updatePost(postId, postAddDto);
 	}
 
 }

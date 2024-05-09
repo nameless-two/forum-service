@@ -3,10 +3,10 @@ package telran.java52.forum.service;
 import java.util.List;
 import java.util.Set;
 
+import telran.java52.forum.dto.CommentAddDto;
 import telran.java52.forum.dto.PeriodDto;
 import telran.java52.forum.dto.PostAddDto;
 import telran.java52.forum.dto.PostDto;
-import telran.java52.forum.dto.PostUpdateDto;
 
 public interface ForumService {
 
@@ -18,7 +18,7 @@ public interface ForumService {
 	
 	List<PostDto> findPostsByAuthor(String user);
 	
-	PostDto addComment(String postId, String user, String message);
+	PostDto addComment(String postId, String user, CommentAddDto commentAddDto);
 	
 	PostDto deletePost(String postId);
 
@@ -26,6 +26,6 @@ public interface ForumService {
 	
 	List<PostDto> findPostsByPeriod(PeriodDto period);
 	
-	PostDto updatePost(String postId, PostUpdateDto postUpdateDto);
+	PostDto updatePost(String postId, PostAddDto postAddDto);
 	
 }

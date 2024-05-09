@@ -1,5 +1,7 @@
 package telran.java52.forum.dto;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +13,6 @@ public class PostAddDto {
 
 	String title;
 	String content;
-	String[] tags;
+	List<String> tags;
 
 }
