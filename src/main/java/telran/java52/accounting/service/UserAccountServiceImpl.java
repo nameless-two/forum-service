@@ -9,6 +9,7 @@ import telran.java52.accounting.dto.RolesDto;
 import telran.java52.accounting.dto.UserDto;
 import telran.java52.accounting.dto.UserRegisterDto;
 import telran.java52.accounting.dto.UserUpdateDto;
+import telran.java52.accounting.dto.exception.UserAlreadyExistsException;
 import telran.java52.accounting.dto.exception.UserNotFoundException;
 import telran.java52.accounting.model.UserAccount;
 
@@ -21,6 +22,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	@Override
 	public UserDto register(UserRegisterDto userRegisterDto) {
+		accountingRepository.findById(userRegisterDto.getLogin()).ifPresent(a -> {
+			throw new UserAlreadyExistsException();
+		});
+		;
 		UserAccount user = modelMapper.map(userRegisterDto, UserAccount.class);
 		accountingRepository.save(user);
 		user = accountingRepository.save(user);
@@ -29,7 +34,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	@Override
 	public UserDto getUser(String login) {
-		return modelMapper.map(accountingRepository.findById(login), UserDto.class);
+		return modelMapper.map(accountingRepository.findById(login).orElseThrow(UserNotFoundException::new),
+				UserDto.class);
 	}
 
 	@Override
@@ -67,7 +73,6 @@ public class UserAccountServiceImpl implements UserAccountService {
 		UserAccount user = accountingRepository.findById(login).orElseThrow(UserNotFoundException::new);
 		if (newPassword != null)
 			user.setPassword(newPassword);
-		user = accountingRepository.save(user);
 	}
 
 }
