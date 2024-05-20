@@ -1,5 +1,6 @@
 package telran.java52.accounting.service;
 
+import org.mindrot.jbcrypt.BCrypt;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +10,7 @@ import telran.java52.accounting.dto.RolesDto;
 import telran.java52.accounting.dto.UserDto;
 import telran.java52.accounting.dto.UserRegisterDto;
 import telran.java52.accounting.dto.UserUpdateDto;
+import telran.java52.accounting.dto.exception.IncorrectRoleException;
 import telran.java52.accounting.dto.exception.UserAlreadyExistsException;
 import telran.java52.accounting.dto.exception.UserNotFoundException;
 import telran.java52.accounting.model.UserAccount;
@@ -27,6 +29,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 		});
 		;
 		UserAccount user = modelMapper.map(userRegisterDto, UserAccount.class);
+		String password = BCrypt.hashpw(userRegisterDto.getPassword(), BCrypt.gensalt());
+		user.setPassword(password);
 		accountingRepository.save(user);
 		user = accountingRepository.save(user);
 		return modelMapper.map(user, UserDto.class);
@@ -58,21 +62,27 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 	@Override
 	public RolesDto changeRoleList(String login, String role, boolean isAddRole) {
-		// TODO Auto-generated method stub
 		UserAccount user = accountingRepository.findById(login).orElseThrow(UserNotFoundException::new);
-		if (isAddRole)
-			user.addRole(role);
-		else
-			user.deleteRole(role);
-		user = accountingRepository.save(user);
+		boolean res;
+		try {
+			if (isAddRole)
+				res = user.addRole(role);
+			else
+				res = user.deleteRole(role);
+		} catch (Exception e) {
+			throw new IncorrectRoleException();
+		}
+		if (res)
+			user = accountingRepository.save(user);
 		return modelMapper.map(user.getRoles(), RolesDto.class);
 	}
 
 	@Override
 	public void changePassword(String login, String newPassword) {
 		UserAccount user = accountingRepository.findById(login).orElseThrow(UserNotFoundException::new);
-		if (newPassword != null)
-			user.setPassword(newPassword);
+		String password = BCrypt.hashpw(newPassword, BCrypt.gensalt());
+		user.setPassword(password);
+		accountingRepository.save(user);
 	}
 
 }
