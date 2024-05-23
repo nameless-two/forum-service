@@ -1,9 +1,7 @@
 package telran.java52.security.filter;
 
 import java.io.IOException;
-import java.util.Base64;
 
-import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
@@ -35,12 +33,10 @@ public class UserUpdateFilter implements Filter {
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
 			try {
-				String[] credentials = getCredentials(request.getHeader("Authorization"));
-				UserAccount userAccount = accountingRepository.findById(credentials[0])
-						.orElseThrow(UserNotFoundException::new);
+				String login = request.getUserPrincipal().getName();
+				UserAccount userAccount = accountingRepository.findById(login).orElseThrow(UserNotFoundException::new);
 
-				if (!BCrypt.checkpw(credentials[1], userAccount.getPassword())
-						|| !userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))) {
+				if (!userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))) {
 					throw new RuntimeException();
 				}
 
@@ -60,12 +56,6 @@ public class UserUpdateFilter implements Filter {
 
 	private boolean checkEndpoint(String method, String path) {
 		return HttpMethod.PUT.matches(method) && path.matches("/account/user/\\w+");
-	}
-
-	private String[] getCredentials(String header) {
-		String token = header.split(" ")[1];
-		String decode = new String(Base64.getDecoder().decode(token));
-		return decode.split(":");
 	}
 
 }

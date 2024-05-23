@@ -1,7 +1,6 @@
 package telran.java52.security.filter;
 
 import java.io.IOException;
-import java.util.Base64;
 
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
@@ -35,8 +34,7 @@ public class AdminManagingRolesFilter implements Filter {
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
 			try {
-				String[] credentials = getCredentials(request.getHeader("Authorization"));
-				UserAccount userAccount = accountingRepository.findById(credentials[0])
+				UserAccount userAccount = accountingRepository.findById(request.getUserPrincipal().getName())
 						.orElseThrow(UserNotFoundException::new);
 				if (!userAccount.getRoles().contains(Role.ADMINISTRATOR)) {
 					throw new RuntimeException();
@@ -53,12 +51,6 @@ public class AdminManagingRolesFilter implements Filter {
 	private boolean checkEndpoint(String method, String path) {
 		return (HttpMethod.PUT.matches(method) || HttpMethod.DELETE.matches(method))
 				&& path.matches("/account/user/\\w+/role/\\w+");
-	}
-
-	private String[] getCredentials(String header) {
-		String token = header.split(" ")[1];
-		String decode = new String(Base64.getDecoder().decode(token));
-		return decode.split(":");
 	}
 
 }
