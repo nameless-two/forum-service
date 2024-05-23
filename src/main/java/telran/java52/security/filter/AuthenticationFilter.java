@@ -49,13 +49,16 @@ public class AuthenticationFilter implements Filter {
 				return;
 			}
 		}
-		
+
 		request.getUserPrincipal();
 		chain.doFilter(request, response);
 	}
 
 	private boolean checkEndpoint(String method, String path) {
-		return !(HttpMethod.POST.matches(method) && path.matches("/account/register"));
+		return !((HttpMethod.POST.matches(method) && path.matches("/account/register"))
+				|| (HttpMethod.POST.matches(method) && path.matches("/forum/posts/period"))
+				|| (HttpMethod.POST.matches(method) && path.matches("/forum/posts/tags"))
+				|| (HttpMethod.GET.matches(method) && path.matches("/forum/posts/author/\\w+")));
 	}
 
 	private String[] getCredentials(String header) {

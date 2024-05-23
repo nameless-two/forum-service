@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.dto.exception.UserNotFoundException;
 import telran.java52.accounting.model.Role;
 import telran.java52.accounting.model.UserAccount;
 
@@ -33,19 +32,12 @@ public class UserDeleteFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			try {
-				String login = request.getUserPrincipal().getName();
-				UserAccount userAccount = accountingRepository.findById(login).orElseThrow(UserNotFoundException::new);
+			String login = request.getUserPrincipal().getName();
+			UserAccount userAccount = accountingRepository.findById(login).get();
 
-				if (!((userAccount.getRoles().contains(Role.ADMINISTRATOR))
-						|| (userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))))) {
-					System.out.println(userAccount.getRoles().contains(Role.ADMINISTRATOR));
-					throw new RuntimeException();
-				}
-
-			} catch (Exception e) {
-				response.sendError(401);
-				return;
+			if (!((userAccount.getRoles().contains(Role.ADMINISTRATOR))
+					|| (userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))))) {
+				throw new RuntimeException();
 			}
 		}
 

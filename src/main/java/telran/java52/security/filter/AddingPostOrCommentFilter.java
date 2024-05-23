@@ -19,8 +19,8 @@ import telran.java52.accounting.model.UserAccount;
 
 @Component
 @RequiredArgsConstructor
-@Order(30)
-public class UserUpdateFilter implements Filter {
+@Order(50)
+public class AddingPostOrCommentFilter implements Filter {
 
 	final AccountingRepository accountingRepository;
 
@@ -31,24 +31,26 @@ public class UserUpdateFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-				String login = request.getUserPrincipal().getName();
-				UserAccount userAccount = accountingRepository.findById(login).get();
+			String login = request.getUserPrincipal().getName();
+			UserAccount userAccount = accountingRepository.findById(login).get();
 
-				if (!userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))) {
-					throw new RuntimeException();
-				}
+			if (!userAccount.getLogin().equalsIgnoreCase(getUserFromPath(request.getServletPath()))) {
+				throw new RuntimeException();
+			}
 		}
 
 		chain.doFilter(request, response);
 
 	}
 
-	private String getLoginFromPath(String servletPath) {
-		return servletPath.split("/")[3];
+	private String getUserFromPath(String servletPath) {
+		String[] res = servletPath.split("/");
+		return res[res.length-1];
 	}
 
 	private boolean checkEndpoint(String method, String path) {
-		return HttpMethod.PUT.matches(method) && path.matches("/account/user/\\w+");
+		return (HttpMethod.POST.matches(method) && path.matches("/forum/post/\\w+"))
+				|| (HttpMethod.PUT.matches(method) && path.matches("/forum/post/\\w+/comment/\\w+"));
 	}
 
 }

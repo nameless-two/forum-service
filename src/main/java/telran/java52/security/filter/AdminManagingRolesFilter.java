@@ -15,7 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.dto.exception.UserNotFoundException;
 import telran.java52.accounting.model.Role;
 import telran.java52.accounting.model.UserAccount;
 
@@ -33,14 +32,9 @@ public class AdminManagingRolesFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			try {
-				UserAccount userAccount = accountingRepository.findById(request.getUserPrincipal().getName())
-						.orElseThrow(UserNotFoundException::new);
-				if (!userAccount.getRoles().contains(Role.ADMINISTRATOR)) {
-					throw new RuntimeException();
-				}
-			} catch (Exception e) {
-				response.sendError(401);
+			UserAccount userAccount = accountingRepository.findById(request.getUserPrincipal().getName()).get();
+			if (!userAccount.getRoles().contains(Role.ADMINISTRATOR)) {
+				response.sendError(403);
 				return;
 			}
 		}
