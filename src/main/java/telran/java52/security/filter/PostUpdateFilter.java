@@ -14,18 +14,16 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.model.UserAccount;
 import telran.java52.forum.dao.ForumRepository;
 import telran.java52.forum.dto.exception.PostNotFoundException;
 import telran.java52.forum.model.Post;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(60)
 public class PostUpdateFilter implements Filter {
 
-	final AccountingRepository accountingRepository;
 	final ForumRepository forumRepository;
 
 	@Override
@@ -35,12 +33,11 @@ public class PostUpdateFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			String login = request.getUserPrincipal().getName();
+			User user = (User) request.getUserPrincipal();
 			Post post = forumRepository.findById(getPostFromPath(request.getServletPath()))
 					.orElseThrow(PostNotFoundException::new);
-			UserAccount userAccount = accountingRepository.findById(login).get();
 
-			if (!userAccount.getLogin().equalsIgnoreCase(post.getAuthor())) {
+			if (!user.getName().equalsIgnoreCase(post.getAuthor())) {
 				response.sendError(403);
 				return;
 			}

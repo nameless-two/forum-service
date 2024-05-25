@@ -14,16 +14,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.model.Role;
-import telran.java52.accounting.model.UserAccount;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(40)
 public class UserDeleteFilter implements Filter {
-
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -32,12 +28,12 @@ public class UserDeleteFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			String login = request.getUserPrincipal().getName();
-			UserAccount userAccount = accountingRepository.findById(login).get();
+			User user = (User) request.getUserPrincipal();
 
-			if (!((userAccount.getRoles().contains(Role.ADMINISTRATOR))
-					|| (userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))))) {
-				throw new RuntimeException();
+			if (!((user.getRoles().contains("ADMINISTRATOR"))
+					|| (user.getName().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))))) {
+				response.sendError(403);
+				return;
 			}
 		}
 

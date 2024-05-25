@@ -14,15 +14,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.model.UserAccount;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(30)
 public class UserUpdateFilter implements Filter {
-
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -31,11 +28,10 @@ public class UserUpdateFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-				String login = request.getUserPrincipal().getName();
-				UserAccount userAccount = accountingRepository.findById(login).get();
-
-				if (!userAccount.getLogin().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))) {
-					throw new RuntimeException();
+				User user = (User) request.getUserPrincipal();
+				if (!user.getName().equalsIgnoreCase(getLoginFromPath(request.getServletPath()))) {
+					response.sendError(403);
+					return;
 				}
 		}
 

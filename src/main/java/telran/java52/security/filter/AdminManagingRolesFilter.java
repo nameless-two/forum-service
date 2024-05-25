@@ -14,16 +14,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.model.Role;
-import telran.java52.accounting.model.UserAccount;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(20)
 public class AdminManagingRolesFilter implements Filter {
-
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -32,8 +28,8 @@ public class AdminManagingRolesFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			UserAccount userAccount = accountingRepository.findById(request.getUserPrincipal().getName()).get();
-			if (!userAccount.getRoles().contains(Role.ADMINISTRATOR)) {
+			User user = (User) request.getUserPrincipal();
+			if (!user.getRoles().contains("ADMINISTRATOR")) {
 				response.sendError(403);
 				return;
 			}

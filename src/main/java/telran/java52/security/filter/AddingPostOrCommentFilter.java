@@ -14,15 +14,12 @@ import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import telran.java52.accounting.dao.AccountingRepository;
-import telran.java52.accounting.model.UserAccount;
+import telran.java52.security.model.User;
 
 @Component
 @RequiredArgsConstructor
 @Order(50)
 public class AddingPostOrCommentFilter implements Filter {
-
-	final AccountingRepository accountingRepository;
 
 	@Override
 	public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain)
@@ -31,11 +28,11 @@ public class AddingPostOrCommentFilter implements Filter {
 		HttpServletResponse response = (HttpServletResponse) resp;
 
 		if (checkEndpoint(request.getMethod(), request.getServletPath())) {
-			String login = request.getUserPrincipal().getName();
-			UserAccount userAccount = accountingRepository.findById(login).get();
+			User user = (User) request.getUserPrincipal();
 
-			if (!userAccount.getLogin().equalsIgnoreCase(getUserFromPath(request.getServletPath()))) {
-				throw new RuntimeException();
+			if (!user.getName().equalsIgnoreCase(getUserFromPath(request.getServletPath()))) {
+				response.sendError(403);
+				return;
 			}
 		}
 
